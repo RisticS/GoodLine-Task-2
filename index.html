@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GL Task 2</title>
+  </head>
+  <body>
+    <h1>Задача 2</h1>
+    <p>Результат в консоли</p>
+    <script>
+      fetch('employees.json')
+        .then(function (u) {
+          return u.json()
+        })
+        .then(function (json) {
+          jsondata = json
+
+          var groupBy = function (data, key) {
+            return data.reduce(function (storage, item) {
+              var group = item[key]
+              storage[group] = storage[group] || []
+              storage[group].push(item)
+              return storage
+            }, {})
+          }
+          var groupedByTeam = groupBy(jsondata, 'dept')
+
+          for (var key in groupedByTeam) {
+            var count = 0
+            count = groupedByTeam[key].length
+            groupedByTeam[key]['count'] = count
+
+            var people = []
+            var avg_hours = 0
+            groupedByTeam[key].forEach((emp, index, eArr) => {
+              people = people.concat(emp)
+              if (typeof emp.hours !== 'undefined') {
+                avg_hours = avg_hours + emp.hours
+              }
+              delete emp['dept']
+            })
+
+            groupedByTeam[key].forEach((emp, index, eArr) => {
+              eArr.splice(index, count)
+            })
+
+            groupedByTeam[key].push({
+              count: count,
+              avg_hours: Math.round(avg_hours / count),
+              people: people,
+            })
+          }
+
+          console.log(groupedByTeam)
+        })
+    </script>
+  </body>
+</html>
